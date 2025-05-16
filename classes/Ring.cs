@@ -3,17 +3,17 @@ using generics.interfaces;
 
 namespace generics.classes;
 
-public class Ring<T> : IRotable, IEnumerable
+public class Ring<T> : IRotable, IEnumerable, IPushable<T>, IPoppable<T>
 {
     private int _count = 0;
-    public List<T> _ring = [];
+    public List<T> _ring = [];  //Storage list
 
     public IEnumerator GetEnumerator()
     {
         return _ring.GetEnumerator();
     }
 
-    public void Isert(T item)
+    public void Push(T item)
     {
         _ring.Add(item);
         _count++;
@@ -36,8 +36,16 @@ public class Ring<T> : IRotable, IEnumerable
         }
     }
 
+    public T Pop()
+    {
+        if (_count > 0)
+        {
+            T item = _ring[0];
+            _ring.RemoveAt(0);
+            _count--;
+            return item;
+        }
+        return default(T);
+
+    }
 }
-
-
-
-
