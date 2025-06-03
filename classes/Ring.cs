@@ -1,51 +1,82 @@
 using System.Collections;
+using System.Dynamic;
+using System.Runtime.CompilerServices;
 using generics.interfaces;
 
 namespace generics.classes;
 
-public class Ring<T> : IRotable, IEnumerable, IPushable<T>, IPoppable<T>
+public class Ring<T>() : IRotable, IEnumerable, IPushable<T>, IPoppable<T>
 {
-    private int _count = 0;
-    public List<T> _ring = [];  //Storage list
+    public int Position { get; set; } = 0;
+    public int Count { get; set; } = 0;
 
-    public IEnumerator GetEnumerator()
-    {
-        return _ring.GetEnumerator();
-    }
+    private List<T> _ring = new List<T>();  //Storage list
+
+
+    public T? this[int index] => _ring[index];
+    // {
+    //     get => Count == 0 ? default(T) : _ring[(Position + index) % Count];
+    //     set
+    //     {
+    //         if (Count == 0)
+    //         {
+    //             _ring[0] = value!;
+    //             Position = 0;
+    //             Count++;
+    //         }
+    //         else
+    //         {
+    //             _ring[(Position + index) % Count] = value!;
+    //         }
+    //     }
+    // }
 
     public void Push(T item)
     {
-        _ring.Add(item);
-        _count++;
-    }
-    public void RotateLeft()
-    {
-        if (_count > 0)
+        if (Count == 0) { _ring.Insert(Position, item); }
+        else
         {
-            _ring.Add(_ring[0]);
-            _ring.RemoveAt(0);
+            _ring.Insert(++Position, item);
         }
+        Count++;
     }
 
-    public void RotateRight()
+    public void RotateLeft()   // => Position = (Position - 1 + Count) % Count;
     {
-        if (_count > 0)
-        {
-            _ring.Insert(0, _ring[_count - 1]);
-            _ring.RemoveAt(_count);
-        }
+        Position--;
+        if (Position < 0) Position = Count - 1;
     }
+
+    public void RotateRight() //=> Position = (Position + 1) % Count;
+    {
+        Position++;
+        if (Position == Count) Position = 0;
+    }
+
+    public T Peek() => _ring[Position];
 
     public T Pop()
     {
-        if (_count > 0)
+        if (Count > 0)
         {
-            T item = _ring[0];
-            _ring.RemoveAt(0);
-            _count--;
+            T item = _ring[Position];
+            _ring.RemoveAt(Position);
+            Count--;
             return item;
         }
-        return default(T);
+        return default(T)!;
 
+    }
+
+    public IEnumerator GetEnumerator()
+    {
+        if (Count == 0) yield return null;
+        else
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                yield return _ring[(Position + i) % Count];
+            }
+        }
     }
 }
